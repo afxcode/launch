@@ -50,6 +50,7 @@ func main() {
 
 	argAppName := flag.String("appname", "", "Application name (will be used as service name)")
 	argExecutable := flag.String("executable", "", "Executable file")
+	argExecutableArgument := flag.String("argument", "", "Executable argument")
 	argWorkdir := flag.String("workdir", "", "Working directory")
 	argEnableLogFile := flag.Bool("enable-log-file", false, "Enable log to file (<workdir>/launch_log/<appname>.log)")
 	argServiceInstall := flag.Bool("service-install", false, "Service install")
@@ -84,7 +85,7 @@ func main() {
 	}
 
 	if *argServiceInstall {
-		err = serviceInstall(*argAppName, *argExecutable, *argWorkdir, enableLogFile)
+		err = serviceInstall(*argAppName, *argExecutable, *argExecutableArgument, *argWorkdir, enableLogFile)
 		return
 	}
 	if *argServiceUninstall {
@@ -112,7 +113,11 @@ func main() {
 	isWinsrv := winservice(winsrvSignalQuit, winsrvQuited, winsrvSignalDone, *argAppName)
 
 	executableFile := path.Join(*argExecutable)
-	cmd := exec.Command(executableFile)
+	executableArgument := ""
+	if argExecutableArgument != nil && *argExecutableArgument != "" {
+		executableArgument = *argExecutableArgument
+	}
+	cmd := exec.Command(executableFile, executableArgument)
 	cmd.Dir = path.Join(workDir)
 
 	cmd.Stdout = &zapio.Writer{Log: l.Log, Level: zapcore.InfoLevel}
@@ -126,6 +131,7 @@ func main() {
 	l.I("Executable started",
 		l.F("appname", *argAppName),
 		l.F("executable", *argExecutable),
+		l.F("argument", *argExecutableArgument),
 		l.F("workdir", *argWorkdir),
 		l.F("pid", cmd.Process.Pid),
 	)

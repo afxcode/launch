@@ -16,7 +16,7 @@ import (
 	l "launch/internal/pkg/logger"
 )
 
-func serviceInstall(appName, executableFile, executableDir string, enableLogFile bool) (err error) {
+func serviceInstall(appName, executableFile, executableArgument, executableDir string, enableLogFile bool) (err error) {
 	if !amAdmin() {
 		return runMeElevated()
 	}
@@ -55,6 +55,7 @@ func serviceInstall(appName, executableFile, executableDir string, enableLogFile
 	args := []string{
 		fmt.Sprintf("-appname=%s", appName),
 		fmt.Sprintf("-executable=%s", executableFile),
+		fmt.Sprintf("-argument=%s", executableArgument),
 		fmt.Sprintf("-workdir=%s", executableDir),
 	}
 	if enableLogFile {
